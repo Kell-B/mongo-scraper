@@ -9,7 +9,7 @@ var NoteSchema = new Schema({
 });
 
 // This creates our model from the above schema, using mongoose's model method
-var comments = mongoose.model('comments', NoteSchema);
+var Note = mongoose.model('Note', NoteSchema);
 
 // Export the Note model
-module.exports = comments;
+module.exports = Note;
