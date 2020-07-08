@@ -3,6 +3,8 @@ var express = require('express');
 var logger = require('morgan');
 var mongoose = require('mongoose');
 var path = require('path');
+const Handlebars = require('handlebars')
+const {allowInsecurePrototypeAccess} = require('@handlebars/allow-prototype-access')
 
 // Scraping tools
 var axios = require('axios');
@@ -31,6 +33,7 @@ var exphbs = require('express-handlebars');
 app.engine(
 	'handlebars',
 	exphbs({
+		handlebars: allowInsecurePrototypeAccess(Handlebars),
 		defaultLayout : 'main',
 		partialsDir   : path.join(__dirname, '/views/layouts/partials')
 	})
@@ -51,10 +54,10 @@ app.get('/', function(req, res) {
 	db.Article
 		.find({ saved: false })
 		.then(function(result) {
+			console.log(result);
 			// This variable allows us to use handlebars by passing the results
 			// from the database as the value in an object
-			var hbsObject = { articles: result };
-			res.render('index', hbsObject);
+			res.render('index', {articles: result});
 		})
 		.catch(function(err) {
 			res.json(err);
@@ -66,14 +69,12 @@ app.get('/scraped', function(req, res) {
 	axios.get('http://www.artnews.com/category/news/').then(function(response) {
 		var $ = cheerio.load(response.data);
 
-		$('h3').each(function(i, element) {
+		$('h3.c-title').each(function(i, element) {
 			var result = {};
 
-			result.title = $(element).text();
+			result.title = $(element).children('a').text();
 
 			result.link = $(element).children('a').attr('href');
-
-			// result.summary = $(element).siblings('.entry-summary').text().trim();
 
 			db.Article
 				.create(result)
