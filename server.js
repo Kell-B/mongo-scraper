@@ -12,7 +12,7 @@ var cheerio = require('cheerio');
 var db = require('./models');
 
 // Initializing the port
-var PORT = process.env.PORT || 3000;
+var PORT = process.env.PORT || 3001;
 
 // Initializing Express
 var app = express();
@@ -66,14 +66,14 @@ app.get('/scraped', function(req, res) {
 	axios.get('http://www.artnews.com/category/news/').then(function(response) {
 		var $ = cheerio.load(response.data);
 
-		$('h2.entry-title').each(function(i, element) {
+		$('h3').each(function(i, element) {
 			var result = {};
 
 			result.title = $(element).text();
 
 			result.link = $(element).children('a').attr('href');
 
-			result.summary = $(element).siblings('.entry-summary').text().trim();
+			// result.summary = $(element).siblings('.entry-summary').text().trim();
 
 			db.Article
 				.create(result)
