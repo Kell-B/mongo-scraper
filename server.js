@@ -3,8 +3,8 @@ var express = require('express');
 var logger = require('morgan');
 var mongoose = require('mongoose');
 var path = require('path');
-const Handlebars = require('handlebars')
-const {allowInsecurePrototypeAccess} = require('@handlebars/allow-prototype-access')
+// const Handlebars = require('handlebars')
+// const {allowInsecurePrototypeAccess} = require('@handlebars/allow-prototype-access')
 
 // Scraping tools
 var axios = require('axios');
@@ -30,14 +30,15 @@ app.use(express.static('public'));
 
 // Using Handlebars
 var exphbs = require('express-handlebars');
-app.engine(
-	'handlebars',
-	exphbs({
-		handlebars: allowInsecurePrototypeAccess(Handlebars),
-		defaultLayout : 'main',
-		partialsDir   : path.join(__dirname, '/views/layouts/partials')
-	})
-);
+// app.engine(
+// 	'handlebars',
+// 	exphbs({
+// 		handlebars: allowInsecurePrototypeAccess(Handlebars),
+// 		defaultLayout : 'main',
+// 		partialsDir   : path.join(__dirname, '/views/layouts/partials')
+// 	})
+// );
+app.engine("handlebars",exphbs({defaultLayout:"main", partialsDir   : path.join(__dirname, '/views/layouts/partials')}))
 app.set('view engine', 'handlebars');
 
 // Connecting to the Mongo DB
@@ -54,10 +55,18 @@ app.get('/', function(req, res) {
 	db.Article
 		.find({ saved: false })
 		.then(function(result) {
+
+			var newResults=result.map(data=>{
+				return {
+					title:data.title,
+					link:data.link,
+					saved:data.saved
+				}
+			})
 			console.log(result);
 			// This variable allows us to use handlebars by passing the results
 			// from the database as the value in an object
-			res.render('index', {articles: result});
+			res.render('index', {articles: newResults});
 		})
 		.catch(function(err) {
 			res.json(err);
@@ -95,6 +104,7 @@ app.get('/saved', function(req, res) {
 		.find({ saved: true })
 		.populate('notes')
 		.then(function(result) {
+
 			var hbsObject = { articles: result };
 			res.render('saved', hbsObject);
 		})
