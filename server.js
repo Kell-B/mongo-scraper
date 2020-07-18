@@ -42,7 +42,7 @@ app.engine("handlebars",exphbs({defaultLayout:"main", partialsDir   : path.join(
 app.set('view engine', 'handlebars');
 
 // Connecting to the Mongo DB
-var MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost/mongoHeadlines';
+var MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost/unit18Populator';
 
 mongoose.connect(MONGODB_URI);
 
